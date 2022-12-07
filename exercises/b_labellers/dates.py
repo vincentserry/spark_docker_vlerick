@@ -1,6 +1,11 @@
 import datetime
+import holidays
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import col, dayofweek, udf
+from pyspark.sql.types import BooleanType, DateType, StructField, StructType
 
-from pyspark.sql import DataFrame
+MIN_YEAR_FOR_HOLIDAYS = 2000
+MAX_YEAR_FOR_HOLIDAYS = 2020
 
 
 def is_belgian_holiday(date: datetime.date) -> bool:
@@ -22,6 +27,8 @@ def label_holidays(
 ) -> DataFrame:
     """Adds a column indicating whether or not the column `colname`
     is a holiday."""
+    holiday_udf = udf(is_belgian_holiday, BooleanType())
+    return frame.withColumn(new_colname, holiday_udf(col(colname)))
     pass
 
 

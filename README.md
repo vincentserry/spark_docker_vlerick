@@ -1,6 +1,6 @@
-I copied this during class.
+I copied this during class 2.
 
-# Building solid data pipelines with PySpark
+# Building solid data pipelines with PySpark modified
 
 📚 A course brought to you by the [Data Minded Academy].
 
