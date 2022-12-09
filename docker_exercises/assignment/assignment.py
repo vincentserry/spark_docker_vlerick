@@ -22,3 +22,11 @@ after_release = spark.read.csv(f"s3a://{BUCKET}/{KEY2}", header=True)
 
 pre_release.show()
 after_release.show()
+
+#Convert the Spark DataFrames to Pandas DataFrames.
+
+pre = pre_release.toPandas()
+after = after_release.toPandas()
+
+#copy in python code
+#after python code you have to conver pandas back to spark using tospark
