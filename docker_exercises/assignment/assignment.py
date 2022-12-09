@@ -7,8 +7,8 @@ print('='*80)
 
 
 BUCKET = "dmacademy-course-assets"
-KEY1 = "vlerick/pre-release.csv"
-KEY2 = "vlerick/after-release.csv"
+KEY1 = "vlerick/pre_release.csv"
+KEY2 = "vlerick/after_release.csv"
 
 config = {
     "spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1",
@@ -18,5 +18,8 @@ conf = SparkConf().setAll(config.items())
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
 # Read the CSV file from the S3 bucket
-pre_release = spark.read.csv(f"s3a://{BUCKET}/{KEY1}", header=True).toPandas()
-after_release = spark.read.csv(f"s3a://{BUCKET}/{KEY2}", header=True).toPanda()
+pre_release = spark.read.csv(f"s3a://{BUCKET}/{KEY1}", header=True)
+after_release = spark.read.csv(f"s3a://{BUCKET}/{KEY2}", header=True)
+
+pre_release.show()
+after_release.show()
