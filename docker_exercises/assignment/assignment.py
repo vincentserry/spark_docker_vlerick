@@ -5,7 +5,6 @@ import os
 print(os.environ["AWS_SECRET_ACCESS_KEY"])
 print('='*80)
 
-
 BUCKET = "dmacademy-course-assets"
 KEY1 = "vlerick/pre_release.csv"
 KEY2 = "vlerick/after_release.csv"
