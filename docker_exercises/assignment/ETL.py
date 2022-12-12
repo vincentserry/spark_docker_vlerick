@@ -1,11 +1,12 @@
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
+from pyspark.sql.types import *
 import pandas as pd
 import numpy as np
 import os
-from sklearn.preprocessing import LabelEncoder,StandardScaler, MinMaxScaler
-from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
 import statsmodels.api as sm
 
 
@@ -30,7 +31,6 @@ df_pre = pre_release.toPandas()
 df_after = after_release.toPandas()
 
 # # IMDB Case
-#Merging data sets to make data preparation easier
 df = pd.merge(df_pre, df_after[['movie_title', 'imdb_score']], how='inner', on='movie_title') 
 df.head()
 
@@ -48,8 +48,6 @@ df.drop('actor_1_facebook_likes', inplace = True, axis = 1)
 
 # ## Grouping categorical variables and changing them into dummies 
 value_counts = df["language"].value_counts()
-print(value_counts)
-
 
 val = value_counts[:1].index
 print (val)
@@ -57,27 +55,24 @@ df['language'] = df.language.where(df.language.isin(val), 'other')
 
 le = LabelEncoder()
 df['language'] = le.fit_transform(df['language'])
-df
 
 # ### Countries
 #Value count for the countries, most movies being from the USA followed by a list of other countries
 value_counts = df["country"].value_counts()
-print(value_counts)
 
 #Selecting the USA grouping rest of countries
 val = value_counts[:3].index
 print (val)
 df['country'] = df.country.where(df.country.isin(val), 'other')
-
+df["country"].value_counts()
 
 df = pd.concat([df, pd.get_dummies(df['country'])], axis=1)
 df.drop('country', axis=1, inplace=True) #dropping original country column
-df
+print(df)
 
 # ### Content rating
 #Value count for the content rating of the movies
 value_counts = df["content_rating"].value_counts()
-print(value_counts)
 
 
 #Selecting R, PG-13 and combing other ratings 
@@ -93,19 +88,16 @@ df["content_rating"].value_counts()
 #Generating binary values using get_dummies
 df = pd.concat([df, pd.get_dummies(df['content_rating'])], axis=1)
 df.drop('content_rating', axis=1, inplace=True) #dropping original content rating column
-df
 
 
 # ## Split Genres on delimiter and add as dummies
 value_counts = df["genres"].value_counts()
 print(value_counts)
-df
-
 
 #turn the categorical variable genres into dummies by spliting on delimiters and dropping original genres column
 df = pd.concat([df, df['genres'].str.get_dummies('|')], axis=1)
 df.drop('genres', axis=1, inplace=True)
-df
+print(df)
 
 
 #Dropping the irrelevant variables and defining dependent and independent variables 
@@ -119,27 +111,13 @@ print(y)
 seed = 123 
 x_train, x_val, y_train, y_val = train_test_split(x,y,test_size=0.25, random_state = seed)
 
+rfreg = RandomForestRegressor(max_depth=10, min_samples_leaf =1, random_state=0).fit(x_train, y_train)
 
-# # Linear regression - statsmodel
-# first  add intercept to X:
-xc_train = sm.add_constant(x_train)
-xc_val = sm.add_constant(x_val)
-#training model
-mod = sm.OLS(y_train,xc_train)
-olsm = mod.fit()
-#output table with parameter estimates (in summary2)
-olsm.summary2().tables[1][['Coef.','Std.Err.','t','P>|t|']]
-
-
-#Making a prediction
-array_pred = np.round(olsm.predict(xc_val),0) 
-y_pred = pd.DataFrame({"y_pred": array_pred},index=x_val.index) 
+#Predict regression forest
+array_pred = np.round(rfreg.predict(x_val),0)
+y_pred = pd.DataFrame({"y_pred": array_pred},index=x_val.index) #index must be same as original database
 val_pred = pd.concat([y_val,y_pred,x_val],axis=1)
 print(val_pred)
 
-
 df_pred_values = spark.createDataFrame(val_pred)
-df_pred_values.show()
-
-
 df_pred_values.write.json(f"s3a://{BUCKET}/vlerick/vincent_serry/", mode="overwrite")

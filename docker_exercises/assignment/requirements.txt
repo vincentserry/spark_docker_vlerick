@@ -2,4 +2,4 @@ numpy==1.23.4
 pandas==1.4.4
 sklearn==1.0.2
 statsmodels==0.13.2
-pyspark
+pyspark==3.2.0
