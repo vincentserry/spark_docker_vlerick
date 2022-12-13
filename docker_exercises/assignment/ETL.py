@@ -120,4 +120,7 @@ val_pred = pd.concat([y_val,y_pred,x_val],axis=1)
 print(val_pred)
 
 df_pred_values = spark.createDataFrame(val_pred)
-df_pred_values.write.json(f"s3a://{BUCKET}/vlerick/vincent_serry/", mode="overwrite")
+
+bucket = 'dmacademy-course-assets'
+prefix = 'vlerick/Vincent_Serry/'
+df_pred_values.write.json(f"s3a://{bucket}/{prefix}/", mode="overwrite")
