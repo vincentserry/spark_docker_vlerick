@@ -11,7 +11,7 @@ WORKDIR /repo
 COPY . /repo
 
 # Install any needed packages specified in requirements.txt
-RUN python -m pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 RUN apt-get update && \
     apt-get install -y default-jdk && \
