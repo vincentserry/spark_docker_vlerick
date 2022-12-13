@@ -11,12 +11,8 @@ WORKDIR /repo
 COPY . /repo
 
 # Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
+RUN python -m pip install -r requirements.txt
 
-RUN apt-get update && \
-    apt-get install -y default-jdk && \
-    apt-get install -y ant && \
-    apt-get clean;
 
 #Define the command to be run when the container is started
 EXPOSE 8080

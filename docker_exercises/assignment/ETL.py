@@ -1,14 +1,6 @@
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
-import pandas as pd
-import numpy as np
-import os
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-import statsmodels.api as sm
-
 
 BUCKET = "dmacademy-course-assets"
 KEY1 = "vlerick/pre_release.csv"
@@ -26,14 +18,17 @@ pre_release = spark.read.csv(f"s3a://{BUCKET}/{KEY1}", header=True)
 after_release = spark.read.csv(f"s3a://{BUCKET}/{KEY2}", header=True)
 
 #Convert the Spark DataFrames to Pandas DataFrames.
-
+import pandas as pd
+import numpy as np
 df_pre = pre_release.toPandas()
 df_after = after_release.toPandas()
 
 # # IMDB Case
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
 df = pd.merge(df_pre, df_after[['movie_title', 'imdb_score']], how='inner', on='movie_title') 
 df.head()
-
 
 #Removing the null values from the dataset, since there aren't a lot of null values
 df.dropna(how = 'any',axis = 0,inplace = True)
@@ -121,6 +116,5 @@ print(val_pred)
 
 df_pred_values = spark.createDataFrame(val_pred)
 
-bucket = 'dmacademy-course-assets'
 prefix = 'vlerick/Vincent_Serry/'
-df_pred_values.write.json(f"s3a://{bucket}/{prefix}/", mode="overwrite")
+df_pred_values.write.json(f"s3a://{BUCKET}/{prefix}/", mode="overwrite")
