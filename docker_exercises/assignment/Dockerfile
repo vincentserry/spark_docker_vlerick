@@ -1,5 +1,10 @@
 FROM python:3.9.12
 
+USER root
+# Install apt packages and clean up cached files
+RUN apt-get update && \
+    apt-get update && apt-get install -y openjdk-11-jdk
+
 #Create non-root user
 RUN useradd -ms /bin/bash python-api
 USER python-api
