@@ -6,10 +6,14 @@ BUCKET = "dmacademy-course-assets"
 KEY1 = "vlerick/pre_release.csv"
 KEY2 = "vlerick/after_release.csv"
 
-config = {
-    "spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1",
-    "spark.hadoop.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
-}
+if len(os.environ.get("AWS_SECRET_ACCESS_KEY")) < 1:
+
+    config = {"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1",
+          "spark.hadoop.fs.s3a.aws.credentials.provider": "org.apache.hadoop.f3.s3a.InstanceProfileCredentialsProvider"
+    }
+else:
+    config = {"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1"
+    }
 conf = SparkConf().setAll(config.items())
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
