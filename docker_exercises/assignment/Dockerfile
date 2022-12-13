@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.9.12
 
 #Create non-root user
 RUN useradd -ms /bin/bash python-api
@@ -12,6 +12,7 @@ COPY . /repo
 
 # Install any needed packages specified in requirements.txt
 RUN python -m pip install -r requirements.txt
+
 RUN apt-get update && \
     apt-get install -y default-jdk && \
     apt-get install -y ant && \
