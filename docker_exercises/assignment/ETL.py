@@ -63,6 +63,7 @@ df["country"].value_counts()
 
 df = pd.concat([df, pd.get_dummies(df['country'])], axis=1)
 df.drop('country', axis=1, inplace=True) #dropping original country column
+df.drop('other', axis=1, inplace=True) 
 print(df)
 
 # ### Content rating
